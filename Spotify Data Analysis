@@ -1,0 +1,101 @@
+-- Built table to hold data downloaded from Kaggle. 
+CREATE TABLE BIT_DB.Spotifydata (
+id integer PRIMARY KEY,
+artist_name varchar NOT NULL,
+track_name varchar NOT NULL,
+track_id varchar NOT NULL,
+popularity integer NOT NULL,
+danceability decimal(4,3) NOT NULL,
+energy decimal(4,3) NOT NULL,
+key integer NOT NULL,
+loudness decimal(5,3) NOT NULL,
+mode integer NOT NULL,
+speechiness decimal(5,4) NOT NULL,
+acousticness decimal(6,5) NOT NULL,
+instrumentalness text NOT NULL,
+liveness decimal(5,4) NOT NULL,
+valence decimal(4,3) NOT NULL,
+tempo decimal(6,3) NOT NULL,
+duration_ms integer NOT NULL,
+time_signature integer NOT NULL 
+);
+
+--Show how many hits each artist has-- 
+SELECT artist_name, COUNT(*) num_hits
+    FROM BIT_DB.Spotifydata
+    GROUP BY artist_name
+    HAVING COUNT(*) >= 1 
+    ORDER BY num_hits DESC;
+
+-- Show which artist has more than one hit listed and how many.-- 
+SELECT artist_name, COUNT(*) num_hits
+    FROM BIT_DB.Spotifydata
+    GROUP BY artist_name
+    HAVING COUNT(*) > 1
+    ORDER BY num_hits DESC; 
+
+--Show the tracks by each artist who has more than one hit listed.--
+SELECT artist_name, track_name
+    FROM BIT_DB.Spotifydata
+    GROUP BY track_name
+    HAVING artist_name IN (SELECT artist_name
+    FROM BIT_DB.Spotifydata
+    GROUP BY artist_name
+    HAVING COUNT(*) > 1)
+    ORDER BY artist_name;
+
+--What is the average duration(ms) 
+SELECT AVG(duration_ms) 
+    FROM BIT_DB.Spotifydata;
+
+--Which tracks have higher than average duration(ms) 
+SELECT track_name, duration_ms, artist_name
+    FROM BIT_DB.Spotifydata
+    WHERE duration_ms >= (SELECT AVG(duration_ms) FROM BIT_DB.Spotifydata
+
+--Which tracks have lower than average duration(ms) 
+SELECT track_name, duration_ms, artist_name
+    FROM Spotifydata
+    WHERE duration_ms<= (SELECT AVG(duration_ms) FROM BIT_DB.Spotifydata
+
+--Average duration(ms) of tracks less than overall average. 
+SELECT AVG(duration_ms)
+    FROM BIT_DB.Spotifydata
+    WHERE duration_ms>=(SELECT AVG(duration_ms) FROM BIT_DB.Spotifydata);
+
+--Average Popularity over all of top 50 songs
+SELECT AVG(popularity) 
+    FROM BIt_DB.Spotifydata;
+
+--Most popular song on top 50 (95)
+SELECT MAX(popularity) 
+    FROM BIT_DB.Spotifydata;
+
+--Least Popular song on top 50 (67)
+SELECT MIN(popularity) 
+    FROM BIT_DB.Spotifydata;
+
+--Median of popularity (88) 
+SELECT popularity 
+    FROM BIT_DB.Spotifydata
+    ORDER BY popularity
+    LIMIT 1
+    OFFSET (SELECT COUNT(*) FROM BIT_DB.Spotifydata) / 2;
+
+--How many songs are above the median popularity (20) 
+SELECT COUNT(*)
+    FROM BIT_DB.Spotifydata
+    WHERE Popularity > (SELECT popularity from BIT_DB.Spotifydata ORDER BY popularity LIMIT 1 OFFSET (SELECT COUNT(*) FROM BIT_DB.Spotifydata) / 2) 
+    Order BY popularity;
+
+--How many songs are below the median populairity 
+SELECT COUNT(*)
+    FROM BIT_DB.Spotifydata
+    WHERE Popularity < (SELECT popularity from BIT_DB.Spotifydata ORDER BY popularity LIMIT 1 OFFSET (SELECT COUNT(*) FROM BIT_DB.Spotifydata) / 2) 
+    Order BY popularity;
+--How many songs for each Popularity number 
+SELECT popularity, COUNT(*) popularity_rating 
+    FROM BIT_DB.Spotifydata
+    GROUP BY popularity
+    ORDER BY popularity DESC
+   
